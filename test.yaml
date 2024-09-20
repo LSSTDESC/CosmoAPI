@@ -6,6 +6,22 @@ observations:
   sacc:
 
 probes:
-  2pt:
-    type: Galaxies.SHEAR_E
+  source:
+    function: TwoPointHarmonic
     nz_type: LSST_Y1_SOURCE_BIN_COLLECTION
+    systematics:
+      type: WeakLensingFactory
+      per_bin_systematics:
+      - type: MultiplicativeShearBiasFactory
+      - type: PhotoZShiftFactory
+      global_systematics:
+      - type: LinearAlignmentSystematicFactory
+        alphag: 1.0
+  lens:
+    function: TwoPointHarmonic
+    nz_type: LSST_Y1_LENS_BIN_COLLECTION
+    systematics:
+      type: NumberCountsFactory
+      per_bin_systematics:
+      - type: PhotoZShiftFactory
+      global_systematics: []

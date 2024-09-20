@@ -14,7 +14,7 @@ def load_nz(yaml_data):
         raise ValueError("nz_type not found in 2pt yaml section")
 
     if nz_type in _SCENARIOS:
-        return _load_nz_from_module(nz_type)
+        return _load_nz_from_module(nz_type).generate()
     else:
         raise NotImplementedError(not_implemented_message)
 
