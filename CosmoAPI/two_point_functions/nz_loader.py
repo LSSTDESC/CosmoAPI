@@ -1,6 +1,9 @@
 import importlib
+import sys
+sys.path.append("..")
+from not_implemented import not_implemented_message
 
-_SCENARIOS = {"LSSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
+_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
               "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
 def load_nz(yaml_data):
@@ -13,7 +16,7 @@ def load_nz(yaml_data):
     if nz_type in _SCENARIOS:
         return _load_nz_from_module(nz_type)
     else:
-        raise ValueError(f"nz_type '{nz_type}' not implemented")
+        raise NotImplementedError(not_implemented_message)
 
 def _load_nz_from_module(nz_type):
     # Define the module path

@@ -1,2 +1,3 @@
 # CosmoAPI
-The "Press Enter for Cosmology" API
+DESC's "Press Enter for Cosmology" API
+
