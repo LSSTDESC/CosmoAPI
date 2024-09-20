@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "CosmoAPI"
+#description = "CAPIVARA: Cosmology API for Validation, Analysis, and Research Applications"
+description = "DESC's `Press Enter for Cosmology` API"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+maintainers = [
+    {name = "Arthur Loureiro", email = "arthur.loureiro@fysik.su.se"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.9.0",
+    "astropy>=5.2.0",
+    "pytest>=7.2.5",
+    "sacc>=0.12",
+    "pyccl>=3.0.2",
+    "jsonargparse[signatures]>=4.0",
+    "pytest",
+    "pytest-cov",
+]
+keywords = ["desc", "python", "inference", "firecrown", "cosmology"]
+dynamic = ["version"]
+
+[tool.setuptools.packages.find]
+where = ["CosmoAPI"]
+
+[tool.flake8]
+max-line-length = 100

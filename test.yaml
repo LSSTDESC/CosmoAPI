@@ -1,0 +1,11 @@
+general:
+  run_name: test
+  output_dir: ./dev/
+
+observations:
+  sacc:
+
+probes:
+  2pt:
+    type: Galaxies.SHEAR_E
+    nz_type: LSST_Y1_SOURCE_BIN_COLLECTION

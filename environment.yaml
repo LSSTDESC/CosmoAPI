@@ -1,0 +1,12 @@
+name: desc_cosmoapi
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.12
+  - numpy
+  - ipykernel
+  - scipy
+  - astropy >=5.3.0
+  - pytest
+  - pip
+  - jsonargparse[signatures]>=4.0
