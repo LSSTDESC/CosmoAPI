@@ -1,35 +1,38 @@
 import sys
-import importlib
 import yaml
+import numpy as np
+import importlib
 from firecrown.utils import base_model_from_yaml
 
-from nz_loader import load_nz
+#from .nz_loader import _load_nz
 sys.path.append("..")
 from not_implemented import not_implemented_message
+from api_io import load_metadata_function_class
 
-def load_metadata_function_class(function_name):
+def generate_ell_theta_array_from_yaml(yaml_data, type_key):
     """
-    Dynamically load a class based on the 'function' name specified in the YAML file.
-    FIXME: Change the docstrings
-    Args:
-        function_name (str): The name of the function specified in the YAML.
-
-    Returns:
-        The loaded class based on the function name.
-    """
-    # Assume functions are part of a module like 'firecrown.functions'
-    base_module = "firecrown.metadata_functions"
+    Generate a linear or logarithmic array based on the  configuration in the YAML data.
     
-    try:
-        # Dynamically import the module
-        module = importlib.import_module(base_module)
-        # Get the function class from the module
-        function_class = getattr(module, function_name)
-        return function_class
-    except ImportError as e:
-        raise ImportError(f"Could not import module {base_module}: {e}")
-    except AttributeError as e:
-        raise AttributeError(f"Class '{function_name}' not found in module {base_module}: {e}")
+    Args:
+        yaml_data (dict): Parsed YAML data in dictionary format.
+        
+    Returns:
+        np.ndarray: Generated array based on the ell_bins configuration.
+    """
+    # calling thix x because it could be ell_bins or theta_bins
+    x_array = yaml_data.get(type_key, {})
+
+    array_type = x_array.get('type')
+    min_val = x_array.get('min')
+    max_val = x_array.get('max')
+    nbins = x_array.get('nbins')
+    
+    if array_type == 'log':
+        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(int))
+    elif array_type == 'linear':
+        return np.linspace(min_val, max_val, nbins).astype(int)
+    else:
+        raise ValueError(f"Unknown array type: {array_type}")
 
 def load_systematics_factory(probe_systematics):
     """
@@ -43,7 +46,7 @@ def load_systematics_factory(probe_systematics):
     """
     # Define base module path based on firecrown's library structure
     base_module = "firecrown.likelihood"
-    
+
     # Mapping of known factories to their submodules
     type_to_submodule = {
         'WeakLensingFactory': 'weak_lensing',
@@ -54,14 +57,14 @@ def load_systematics_factory(probe_systematics):
     systematics_type = probe_systematics['type']
     # Get the submodule for the type
     submodule = type_to_submodule.get(systematics_type)
-    
+
     if submodule is None:
         print(not_implemented_message)
         raise ImportError(f"Unknown systematics type: {systematics_type}")
-    
+
     # Construct the full module path
     module_path = f"{base_module}.{submodule}"
-    
+
     try:
         # Dynamically import the module
         module = importlib.import_module(module_path)
@@ -79,7 +82,7 @@ def load_systematics_factory(probe_systematics):
     except AttributeError as e:
         raise AttributeError(f"Class '{systematics_type}' not found in module {module_path}: {e}")
 
-def process_probes(yaml_data):
+def process_probes_load_2pt(yaml_data):
     """
     Process the probes from the YAML data, check if 'function' is the same across probes with 'nz_type',
     and dynamically load the corresponding function classes.
@@ -91,18 +94,18 @@ def process_probes(yaml_data):
         A dictionary containing the dynamically loaded function classes for each probe.
     """
     probes_data = yaml_data.get('probes', {})
-    
+
     # Variables to track the function consistency
     nz_type_probes = []
     function_name = None
-    
+
     function_classes = {}
-    
+
     # Iterate over each probe in the YAML data
     for probe_name, probe_data in probes_data.items():
         nz_type = probe_data.get('nz_type')
         probe_function = probe_data.get('function')
-        
+
         # If the probe has 'nz_type', we need to check the function
         if nz_type:
             nz_type_probes.append(probe_name)
@@ -114,7 +117,7 @@ def process_probes(yaml_data):
                 # If another nz_type probe has a different function, raise an error
                 if probe_function != function_name:
                     raise ValueError(f"Probes '{nz_type_probes[0]}' and '{probe_name}' have different 'function' values: '{function_name}' != '{probe_function}'")
-            
+
             # Dynamically load the function class
             if probe_function:
                 try:
@@ -122,9 +125,12 @@ def process_probes(yaml_data):
                     function_classes[probe_name] = loaded_function
                 except (ImportError, AttributeError) as e:
                     raise ImportError(f"Error loading function for probe '{probe_name}': {e}")
-    
+
     # If nz_type_probes is non-empty, it confirms nz_type presence and function consistency
     if nz_type_probes:
         print(f"All nz_type probes have the same function: {function_name}")
 
     return loaded_function
+
+def prepare_2pt_functions(yaml_data):
+    print(not_implemented_message)

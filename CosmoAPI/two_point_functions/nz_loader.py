@@ -6,7 +6,7 @@ from not_implemented import not_implemented_message
 _DESC_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
                    "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
-def load_nz(yaml_data):
+def _load_nz(yaml_data):
 
     try: 
         nz_type = yaml_data["nz_type"]
@@ -17,6 +17,14 @@ def load_nz(yaml_data):
         return _load_nz_from_module(nz_type).generate()
     else:
         raise NotImplementedError(not_implemented_message)
+
+def load_all_nz(yaml_data):
+    nzs = []
+    for probe, propr in yaml_data['probes'].items():
+        if 'nz_type' in propr:
+            #print(propr['nz_type'])
+            nzs += _load_nz(propr)
+    return nzs
 
 def _load_nz_from_module(nz_type):
     # Define the module path

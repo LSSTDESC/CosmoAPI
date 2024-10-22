@@ -8,6 +8,11 @@ observations:
 probes:
   source:
     function: TwoPointHarmonic
+    ell_bins:
+      type: log
+      min: 2
+      max: 2000
+      nbins: 128
     nz_type: LSST_Y1_SOURCE_BIN_COLLECTION
     systematics:
       type: WeakLensingFactory
@@ -19,6 +24,11 @@ probes:
         alphag: 1.0
   lens:
     function: TwoPointHarmonic
+    ell_bins:
+      type: linear
+      min: 10
+      max: 1500
+      nbins: 10
     nz_type: LSST_Y1_LENS_BIN_COLLECTION
     systematics:
       type: NumberCountsFactory
