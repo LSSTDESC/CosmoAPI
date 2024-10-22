@@ -3,8 +3,8 @@ import sys
 sys.path.append("..")
 from not_implemented import not_implemented_message
 
-_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
-              "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
+_DESC_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
+                   "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
 def load_nz(yaml_data):
 
@@ -13,7 +13,7 @@ def load_nz(yaml_data):
     except KeyError:
         raise ValueError("nz_type not found in 2pt yaml section")
 
-    if nz_type in _SCENARIOS:
+    if nz_type in _DESC_SCENARIOS:
         return _load_nz_from_module(nz_type).generate()
     else:
         raise NotImplementedError(not_implemented_message)

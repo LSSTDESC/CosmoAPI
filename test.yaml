@@ -25,3 +25,8 @@ probes:
       per_bin_systematics:
       - type: PhotoZShiftFactory
       global_systematics: []
+
+  # SNe:
+  #   function: SuperNovae
+  #   systematics:
+  #     type: TestBreak
