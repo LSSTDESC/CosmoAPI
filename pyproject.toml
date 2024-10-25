@@ -36,3 +36,9 @@ where = ["CosmoAPI"]
 
 [tool.flake8]
 max-line-length = 100
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "CosmoAPI/_version.py"

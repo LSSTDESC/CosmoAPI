@@ -115,7 +115,7 @@ def process_probes_load_2pt(yaml_data):
         # If the probe has 'nz_type', we need to check the function
         if nz_type:
             nz_type_probes.append(probe_name)
-            
+
             # If it's the first nz_type probe, set the expected function name
             if function_name is None:
                 function_name = probe_function
