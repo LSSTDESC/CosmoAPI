@@ -168,6 +168,9 @@ def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes,
         all_two_point_metadata = [two_point_function(XY=ij, ells=ell) 
                                  for ij, ell in zip(two_point_bins, ells_list)]
     elif two_point_function is firecrown.metadata_types.TwoPointReal:
+        #FIXME: this is breaking for some strange reason
+        print(not_implemented_message)
+        raise NotImplementedError("Real space two-point functions not implemented")
         xtype = 'theta_bins'
         theta_list = []
         for p in two_pt_probes:
