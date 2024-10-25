@@ -9,7 +9,7 @@ sys.path.append("..")
 from not_implemented import not_implemented_message
 from api_io import load_metadata_function_class
 
-def generate_ell_theta_array_from_yaml(yaml_data, type_key):
+def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
     """
     Generate a linear or logarithmic array based on the  configuration in the YAML data.
     
@@ -26,11 +26,11 @@ def generate_ell_theta_array_from_yaml(yaml_data, type_key):
     min_val = x_array.get('min')
     max_val = x_array.get('max')
     nbins = x_array.get('nbins')
-    
+
     if array_type == 'log':
-        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(int))
+        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(dtype))
     elif array_type == 'linear':
-        return np.linspace(min_val, max_val, nbins).astype(int)
+        return np.linspace(min_val, max_val, nbins).astype(dtype)
     else:
         raise ValueError(f"Unknown array type: {array_type}")
 
