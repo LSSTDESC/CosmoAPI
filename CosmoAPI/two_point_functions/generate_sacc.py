@@ -2,12 +2,17 @@ import sys
 import yaml
 import numpy as np
 import importlib
+import firecrown
+from firecrown.metadata_functions import make_all_photoz_bin_combinations
+import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
-#from .nz_loader import _load_nz
+
+from .nz_loader import load_all_nz
 sys.path.append("..")
 from not_implemented import not_implemented_message
 from api_io import load_metadata_function_class
+
 
 def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
     """
@@ -84,7 +89,8 @@ def load_systematics_factory(probe_systematics):
 
 def process_probes_load_2pt(yaml_data):
     """
-    Process the probes from the YAML data, check if 'function' is the same across probes with 'nz_type',
+    Process the probes from the YAML data, check if 'function' 
+    is the same across probes with 'nz_type',
     and dynamically load the corresponding function classes.
 
     Args:
@@ -130,7 +136,84 @@ def process_probes_load_2pt(yaml_data):
     if nz_type_probes:
         print(f"All nz_type probes have the same function: {function_name}")
 
-    return loaded_function
+    return loaded_function, nz_type_probes
+
+def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes, 
+                                two_point_bins):
+    """
+    Generate the metadata for the two-point functions based on the YAML data.
+
+    Parameters
+    ----------
+    yaml_data : dict
+        Parsed YAML data in dictionary format.
+    two_point_function :  firecrown.metadata_type
+        The class for the two-point function.
+    two_pt_probes : list
+        List of probes for the two-point functions.
+    two_point_bins : list
+        List of two-point bins.
+
+    Returns
+    -------
+    list
+        List of metadata objects for the two-point functions.
+    """
+    # check if real or harmonic space function
+    if two_point_function is firecrown.metadata_types.TwoPointHarmonic:
+        xtype = 'ell_bins'
+        ells_list = []
+        for p in two_pt_probes:
+            ells_list.append(generate_ell_theta_array_from_yaml(yaml_data['probes'][p], xtype))
+        all_two_point_metadata = [two_point_function(XY=ij, ells=ell) 
+                                 for ij, ell in zip(two_point_bins, ells_list)]
+    elif two_point_function is firecrown.metadata_types.TwoPointReal:
+        xtype = 'theta_bins'
+        theta_list = []
+        for p in two_pt_probes:
+            theta_list.append(generate_ell_theta_array_from_yaml(yaml_data['probes'][p], xtype))
+        all_two_point_metadata = [two_point_function(XY=ij, thetas=theta) 
+                                 for ij, theta in zip(two_point_bins, theta_list)]
+    else:
+        raise ValueError("Unknown TwoPointFunction type")
+    return all_two_point_metadata
 
 def prepare_2pt_functions(yaml_data):
-    print(not_implemented_message)
+    # here we call this X because we do not know if it is ell_bins or theta_bins
+    two_point_function, two_pt_probes = process_probes_load_2pt(yaml_data)
+
+    if len(two_pt_probes) > 2:
+        print(not_implemented_message)
+        raise NotImplementedError("More than 2 2pt probes not implemented")
+
+    # loads the nz_type probes
+    nzs = load_all_nz(yaml_data)
+
+    # make all the bin combinations:
+    all_two_point_bins = make_all_photoz_bin_combinations(nzs)
+
+    # load all the systematics for all probes:
+    probes = yaml_data.get("probes", [])
+    for p in two_pt_probes:
+        type_factory = probes[p]['systematics'].get('type')
+        if type_factory == 'WeakLensingFactory':
+            wlfact = load_systematics_factory(yaml_data['probes'][p]['systematics'])
+        elif type_factory == 'NumberCountsFactory':
+            ncfact = load_systematics_factory(yaml_data['probes'][p]['systematics'])
+        else:
+            raise ValueError(f"Unknown systematics type: {type_factory} for probe {p}")
+
+    # generate the metadata for the two-point functions
+    all_two_point_metadata = generate_two_point_metadata(yaml_data,
+                                                         two_point_function,
+                                                         two_pt_probes,
+                                                         all_two_point_bins)
+
+    # prepare all the two point functions:
+    all_two_point_functions = tp.TwoPoint.from_metadata(
+        metadata_seq=all_two_point_metadata,
+        wl_factory=wlfact,
+        nc_factory=ncfact,
+    )
+
+    return all_two_point_functions, all_two_point_metadata

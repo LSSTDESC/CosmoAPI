@@ -7,7 +7,6 @@ _DESC_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTI
                    "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
 def _load_nz(yaml_data):
-
     try: 
         nz_type = yaml_data["nz_type"]
     except KeyError:

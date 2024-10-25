@@ -10,7 +10,7 @@ probes:
     function: TwoPointHarmonic
     ell_bins:
       type: log
-      min: 2
+      min: 30
       max: 2000
       nbins: 128
     nz_type: LSST_Y1_SOURCE_BIN_COLLECTION
@@ -26,7 +26,7 @@ probes:
     function: TwoPointHarmonic
     ell_bins:
       type: linear
-      min: 10
+      min: 30
       max: 1500
       nbins: 10
     nz_type: LSST_Y1_LENS_BIN_COLLECTION
@@ -36,7 +36,7 @@ probes:
       - type: PhotoZShiftFactory
       global_systematics: []
 
-  # SNe:
-  #   function: SuperNovae
-  #   systematics:
-  #     type: TestBreak
+  SNe:
+    function: SuperNovae
+    systematics:
+      type: TestBreak
