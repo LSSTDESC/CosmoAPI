@@ -1,12 +1,13 @@
 import yaml
 import importlib
+from typing import Any, Dict
 
-def load_yaml_file(file_path):
+def load_yaml_file(file_path: str) -> Dict[str, Any]:
     """Helper function to load a YAML file"""
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
-def load_metadata_function_class(function_name):
+def load_metadata_function_class(function_name: str) -> Any:
     """
     Dynamically load a class based on the 'function' name specified in the YAML file.
     FIXME: Change the docstrings

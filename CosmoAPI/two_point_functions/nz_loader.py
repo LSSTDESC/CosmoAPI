@@ -1,12 +1,13 @@
 import importlib
 import sys
+from typing import Dict, List, Any, Type
 sys.path.append("..")
 from not_implemented import not_implemented_message
 
 _DESC_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
                    "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
-def _load_nz(yaml_data):
+def _load_nz(yaml_data: Dict[str, Any]) -> List[Any]:
     try: 
         nz_type = yaml_data["nz_type"]
     except KeyError:
@@ -17,7 +18,7 @@ def _load_nz(yaml_data):
     else:
         raise NotImplementedError(not_implemented_message)
 
-def load_all_nz(yaml_data):
+def load_all_nz(yaml_data: Dict[str, Any]) -> List[Any]:
     nzs = []
     for probe, propr in yaml_data['probes'].items():
         if 'nz_type' in propr:
@@ -25,7 +26,7 @@ def load_all_nz(yaml_data):
             nzs += _load_nz(propr)
     return nzs
 
-def _load_nz_from_module(nz_type):
+def _load_nz_from_module(nz_type: str) -> Type:
     # Define the module path
     module_path = "firecrown.generators.inferred_galaxy_zdist"
 

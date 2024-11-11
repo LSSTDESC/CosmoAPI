@@ -1,23 +1,24 @@
 import argparse
+from typing import Dict, Any
 
 from .api_io import load_yaml_file
 from .not_implemented import not_implemented_message
 
-def gen_datavec(config, verbose=False):
+def gen_datavec(config: Dict[str, Any], verbose: bool = False) -> None:
     # Functionality for generating data vector
     if verbose:
         print("Verbose mode enabled.")
     print("Generating data vector with config:", config)
 
-def gen_covariance(config):
+def gen_covariance(config: Dict[str, Any]) -> None:
     # Functionality for generating covariance
     print(not_implemented_message)
 
-def forecast(config):
+def forecast(config: Dict[str, Any]) -> None:
     # Functionality for forecast
     print(not_implemented_message)
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="CosmoAPI",
         description="CosmoAPI: Cosmology Analysis Pipeline Interface"
