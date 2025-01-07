@@ -48,6 +48,7 @@ The configuration file is a YAML file that contains the following sections:
 
 import datetime
 import sys
+import os
 import numpy as np
 import pyccl as ccl
 import yaml
@@ -79,19 +80,8 @@ import firecrown.likelihood.two_point as tp
 from firecrown.parameters import ParamsMap
 from augur.utils.cov_utils import TJPCovGaus
 
-
-def load_yaml_file(yaml_file: str) -> dict:
-    """
-    Load the YAML configuration file.
-
-    Args:
-        yaml_file (str): Path to the YAML configuration file.
-
-    Returns:
-        dict: Parsed YAML data.
-    """
-    with open(yaml_file, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+sys.path.append("..")
+from api_io import load_yaml_file
 
 
 def build_modeling_tools(config: dict) -> ModelingTools:
@@ -624,6 +614,10 @@ if __name__ == "__main__":
 
     # Add the covariance matrix to the Sacc object and save it
     sacc_data.add_covariance(covariance_matrix)
+
+    # checks if the ./sacc_files directory exists, if not, create it
+    if not os.path.exists("./sacc_files"):
+        os.makedirs("./sacc_files")
 
     # Save the Sacc object
     sacc_data.metadata["stop"] = datetime.datetime.now().isoformat()

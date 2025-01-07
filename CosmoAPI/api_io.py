@@ -1,10 +1,18 @@
 import yaml
 import importlib
 
-def load_yaml_file(file_path):
-    """Helper function to load a YAML file"""
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
+def load_yaml_file(yaml_file: str) -> dict:
+    """
+    Load the YAML configuration file.
+
+    Args:
+        yaml_file (str): Path to the YAML configuration file.
+
+    Returns:
+        dict: Parsed YAML data.
+    """
+    with open(yaml_file, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 def load_metadata_function_class(function_name):
     """
