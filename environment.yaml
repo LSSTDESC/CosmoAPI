@@ -1,9 +1,9 @@
-name: desc_cosmoapi
+name: desc_capi
 channels:
   - conda-forge
 dependencies:
   - python>=3.12
-  - numpy
+  - numpy<2.0
   - ipykernel
   - scipy
   - astropy >=5.3.0
