@@ -14,6 +14,10 @@ probes:
       max: 2000
       nbins: 128
     nz_type: SRD_Y1
+    z_array: 
+      z_min: &z_min 0.0001
+      z_max: &z_max 3.5
+      z_number: &z_number 1000
     systematics:
       type: WeakLensingFactory
       per_bin_systematics:
@@ -30,6 +34,10 @@ probes:
       max: 1500
       nbins: 10
     nz_type: SRD_Y1
+    z_array:
+      z_min: *z_min
+      z_max: *z_max
+      z_number: *z_number
     systematics:
       type: NumberCountsFactory
       per_bin_systematics:
@@ -42,7 +50,3 @@ probes:
       type: TestBreak
 
 analysis_choices:
-  z_array: # CCLX Github
-    z_start: &z_start 0.0001
-    z_stop: &z_stop 3.5
-    z_number: &z_number 1000
