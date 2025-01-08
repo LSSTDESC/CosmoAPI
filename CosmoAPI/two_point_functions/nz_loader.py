@@ -95,14 +95,18 @@ def get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
     except KeyError:
         raise KeyError(f"Probe '{probe_name}' not a Nz Tracer!")
 
-    # Define the redshift array
-    # FIXME: Need to change this part!
-    config_z = config["analysis_choices"]["z_array"]
-    z_ = LinearGrid1D(
-        start=config_z["z_start"],
-        end=config_z["z_stop"],
-        num=config_z["z_number"]
-    )
+    try:
+        config_z = config[probe_name]["z_array"]
+        z_ = LinearGrid1D(
+            start=config_z["z_min"],
+            end=config_z["z_max"],
+            num=config_z["z_number"]
+        )
+    except KeyError:
+        print("Using default redshift array")
+        z_ = LinearGrid1D(start=0.0001, end=3.5, num=1000)
+
+    # generate the redshift array
     z_array = z_.generate()
 
     if _nz_type == "SRD_Y1":
@@ -117,11 +121,16 @@ def get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
                                                 year="1")
     elif _nz_type == "file":
         nz_file = config['probes'][probe_name]['nz_file']
-        nz_binned = build_distribution_binned(nz_file, probe_name, probe_type,two_pt_type)
+        nz_binned = build_distribution_binned(nz_file, probe_name,
+                                              probe_type, two_pt_type)
     elif _nz_type == "sacc":
-        raise NotImplementedError("sacc support not implemented yet" + not_implemented_message)
+        raise NotImplementedError(
+            "sacc support not implemented yet" + not_implemented_message
+        )
     else:
-        raise ValueError("Unknown nz_type, valid options are 'SRD_Y1', 'SRD_Y10', 'file' and 'sacc'")
+        raise ValueError(
+            "Unknown nz_type, valid options are 'SRD_Y1', 'SRD_Y10', 'file' and 'sacc'"
+        )
 
     return nz_binned
 
