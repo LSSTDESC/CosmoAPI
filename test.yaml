@@ -13,7 +13,7 @@ probes:
       min: 30
       max: 2000
       nbins: 128
-    nz_type: LSST_Y1_SOURCE_BIN_COLLECTION
+    nz_type: SRD_Y1
     systematics:
       type: WeakLensingFactory
       per_bin_systematics:
@@ -29,7 +29,7 @@ probes:
       min: 30
       max: 1500
       nbins: 10
-    nz_type: LSST_Y1_LENS_BIN_COLLECTION
+    nz_type: SRD_Y1
     systematics:
       type: NumberCountsFactory
       per_bin_systematics:
@@ -40,3 +40,9 @@ probes:
     function: SuperNovae
     systematics:
       type: TestBreak
+
+analysis_choices:
+  z_array: # CCLX Github
+    z_start: &z_start 0.0001
+    z_stop: &z_stop 3.5
+    z_number: &z_number 1000

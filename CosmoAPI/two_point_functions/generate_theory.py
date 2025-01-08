@@ -9,9 +9,10 @@ from firecrown.utils import base_model_from_yaml
 
 
 from .nz_loader import load_all_nz
+from .tracers_io import process_probes_load_2pt
 sys.path.append("..")
 from not_implemented import not_implemented_message
-from api_io import load_metadata_function_class
+
 
 
 def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
@@ -87,56 +88,6 @@ def load_systematics_factory(probe_systematics):
     except AttributeError as e:
         raise AttributeError(f"Class '{systematics_type}' not found in module {module_path}: {e}")
 
-def process_probes_load_2pt(yaml_data):
-    """
-    Process the probes from the YAML data, check if 'function' 
-    is the same across probes with 'nz_type',
-    and dynamically load the corresponding function classes.
-
-    Args:
-        yaml_data (dict): Parsed YAML data in dictionary format.
-
-    Returns:
-        A dictionary containing the dynamically loaded function classes for each probe.
-    """
-    probes_data = yaml_data.get('probes', {})
-
-    # Variables to track the function consistency
-    nz_type_probes = []
-    function_name = None
-
-    function_classes = {}
-
-    # Iterate over each probe in the YAML data
-    for probe_name, probe_data in probes_data.items():
-        nz_type = probe_data.get('nz_type')
-        probe_function = probe_data.get('function')
-
-        # If the probe has 'nz_type', we need to check the function
-        if nz_type:
-            nz_type_probes.append(probe_name)
-
-            # If it's the first nz_type probe, set the expected function name
-            if function_name is None:
-                function_name = probe_function
-            else:
-                # If another nz_type probe has a different function, raise an error
-                if probe_function != function_name:
-                    raise ValueError(f"Probes '{nz_type_probes[0]}' and '{probe_name}' have different 'function' values: '{function_name}' != '{probe_function}'")
-
-            # Dynamically load the function class
-            if probe_function:
-                try:
-                    loaded_function = load_metadata_function_class(probe_function)
-                    function_classes[probe_name] = loaded_function
-                except (ImportError, AttributeError) as e:
-                    raise ImportError(f"Error loading function for probe '{probe_name}': {e}")
-
-    # If nz_type_probes is non-empty, it confirms nz_type presence and function consistency
-    if nz_type_probes:
-        print(f"All nz_type probes have the same function: {function_name}")
-
-    return loaded_function, nz_type_probes
 
 def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes, 
                                 two_point_bins):
@@ -197,7 +148,7 @@ def prepare_2pt_functions(yaml_data):
 
     # load all the systematics for all probes:
     probes = yaml_data.get("probes", [])
-    for p in two_pt_probes:
+    for p in two_pt_probes.keys():
         type_factory = probes[p]['systematics'].get('type')
         if type_factory == 'WeakLensingFactory':
             wlfact = load_systematics_factory(yaml_data['probes'][p]['systematics'])
@@ -209,7 +160,7 @@ def prepare_2pt_functions(yaml_data):
     # generate the metadata for the two-point functions
     all_two_point_metadata = generate_two_point_metadata(yaml_data,
                                                          two_point_function,
-                                                         two_pt_probes,
+                                                         two_pt_probes.keys(),
                                                          all_two_point_bins)
 
     # prepare all the two point functions:
