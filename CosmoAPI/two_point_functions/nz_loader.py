@@ -22,21 +22,8 @@ from .tracers_io import process_probes_load_2pt
 sys.path.append("..")
 from not_implemented import not_implemented_message
 
-_DESC_SCENARIOS = {"LSST_Y10_SOURCE_BIN_COLLECTION", "LSST_Y10_LENS_BIN_COLLECTION",
-                   "LSST_Y1_LENS_BIN_COLLECTION", "LSST_Y1_SOURCE_BIN_COLLECTION",}
 
-def _load_nz(yaml_data):
-    try: 
-        nz_type = yaml_data["nz_type"]
-    except KeyError:
-        raise ValueError("nz_type not found in 2pt yaml section")
-
-    if nz_type in _DESC_SCENARIOS:
-        return _load_nz_from_module(nz_type).generate()
-    else:
-        raise NotImplementedError(not_implemented_message)
-
-def load_all_nz(yaml_data: dict, NEW: bool = True) -> list:
+def load_all_redshift_distr(yaml_data: dict) -> list:
     """
     Loads all the redshift distributions from the configuration file.
 
@@ -47,36 +34,17 @@ def load_all_nz(yaml_data: dict, NEW: bool = True) -> list:
     Returns:
         list: List of redshift distributions.
     """
-    if NEW:
-        two_pt_function, probes_dict = process_probes_load_2pt(yaml_data)
-        nzs = []
-        for probe, prob_type in probes_dict.items():
-            _distr = get_redshift_disribution(yaml_data, probe,
-                                              prob_type, two_pt_function)
-            nzs += _distr
-    else:
-        nzs = []
-        for probe, propr in yaml_data['probes'].items():
-            if 'nz_type' in propr:
-                #print(propr['nz_type'])
-                nzs += _load_nz(propr)
+    # gets the 2pt function type and a dict of probes and probe types
+    two_pt_function, probes_dict = process_probes_load_2pt(yaml_data)
+    nzs = []
+    for probe, prob_type in probes_dict.items():
+        _distr = _get_redshift_disribution(yaml_data, probe,
+                                          prob_type, two_pt_function)
+        nzs += _distr
+
     return nzs
 
-def _load_nz_from_module(nz_type):
-    # Define the module path
-    module_path = "firecrown.generators.inferred_galaxy_zdist"
-
-    try:
-        # Dynamically import the module and the object
-        module = importlib.import_module(module_path)
-        nz_type_class = getattr(module, nz_type)
-        return nz_type_class
-    except ImportError as e:
-        raise ImportError(f"Failed to import module {module_path}: {e}")
-    except AttributeError as e:
-        raise AttributeError(f"'{nz_type}' not found in module {module_path}: {e}")
-
-def get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
+def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
                              two_pt_type: Type) -> list:
     """
     Get the redshift distribution defined on the configuration file.
@@ -103,26 +71,26 @@ def get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
             num=config_z["z_number"]
         )
     except KeyError:
-        print("Using default redshift array")
+        print("No z_array provided. Using default redshift array from 0.0001 to 3.5")
         z_ = LinearGrid1D(start=0.0001, end=3.5, num=1000)
 
     # generate the redshift array
     z_array = z_.generate()
 
     if _nz_type == "SRD_Y1":
-        nz_binned = get_srd_distribution_binned(z_array, tracer_name=probe_name,
-                                                tracer_type=probe_type,
-                                                function_type=two_pt_type,
-                                                year="1")
+        nz_binned = _get_srd_distribution_binned(z_array, tracer_name=probe_name,
+                                                 tracer_type=probe_type,
+                                                 function_type=two_pt_type,
+                                                 year="1")
     elif _nz_type == "SRD_Y10":
-        nz_binned = get_srd_distribution_binned(z_array, tracer_name=probe_name,
-                                                tracer_type=probe_type,
-                                                function_type=two_pt_type,
-                                                year="1")
+        nz_binned = _get_srd_distribution_binned(z_array, tracer_name=probe_name,
+                                                 tracer_type=probe_type,
+                                                 function_type=two_pt_type,
+                                                 year="1")
     elif _nz_type == "file":
         nz_file = config['probes'][probe_name]['nz_file']
-        nz_binned = build_distribution_binned(nz_file, probe_name,
-                                              probe_type, two_pt_type)
+        nz_binned = _build_distribution_binned(nz_file, probe_name,
+                                               probe_type, two_pt_type)
     elif _nz_type == "sacc":
         raise NotImplementedError(
             "sacc support not implemented yet" + not_implemented_message
@@ -134,7 +102,7 @@ def get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
 
     return nz_binned
 
-def build_distribution_binned(distribution_path: str,
+def _build_distribution_binned(distribution_path: str,
                               tracer_name: str,
                               tracer_type: str,
                               two_pt_type: Type) -> list[InferredGalaxyZDist]:
@@ -191,7 +159,7 @@ def build_distribution_binned(distribution_path: str,
 
     return infzdist
 
-def get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
+def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
                                 tracer_type: str, function_type: str,
                                 year: str) -> list:
     """

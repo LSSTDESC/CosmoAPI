@@ -8,7 +8,7 @@ import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
 
-from .nz_loader import load_all_nz
+from .nz_loader import load_all_redshift_distr
 from .tracers_io import process_probes_load_2pt
 sys.path.append("..")
 from not_implemented import not_implemented_message
@@ -141,7 +141,7 @@ def prepare_2pt_functions(yaml_data):
         raise NotImplementedError("More than 2 2pt probes not implemented")
 
     # loads the nz_type probes
-    nzs = load_all_nz(yaml_data)
+    nzs = load_all_redshift_distr(yaml_data)
 
     # make all the bin combinations:
     all_two_point_bins = make_all_photoz_bin_combinations(nzs)
