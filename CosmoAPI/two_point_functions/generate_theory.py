@@ -7,12 +7,10 @@ from firecrown.metadata_functions import make_all_photoz_bin_combinations
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
-
 from .nz_loader import load_all_redshift_distr
 from .tracers_io import process_probes_load_2pt
 sys.path.append("..")
 from not_implemented import not_implemented_message
-
 
 
 def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):

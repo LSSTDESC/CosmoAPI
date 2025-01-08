@@ -29,7 +29,6 @@ def load_all_redshift_distr(yaml_data: dict) -> list:
 
     Args:
         yaml_data (dict): Parsed YAML data in dictionary format.
-        NEW (bool): Flag to indicate if the new format is being used. FIXME: Remove after testing.
 
     Returns:
         list: List of redshift distributions.
@@ -41,7 +40,6 @@ def load_all_redshift_distr(yaml_data: dict) -> list:
         _distr = _get_redshift_disribution(yaml_data, probe,
                                           prob_type, two_pt_function)
         nzs += _distr
-
     return nzs
 
 def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
@@ -64,7 +62,7 @@ def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
         raise KeyError(f"Probe '{probe_name}' not a Nz Tracer!")
 
     try:
-        config_z = config[probe_name]["z_array"]
+        config_z = config["probes"][probe_name]["z_array"]
         z_ = LinearGrid1D(
             start=config_z["z_min"],
             end=config_z["z_max"],
@@ -168,7 +166,8 @@ def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
     Args:
         z (np.ndarray): Redshift array.
         tracer_name (str): Name of the tracer (e.g., 'lens' or 'source' or anything).
-        tracer_type (str): Type of the tracer (e.g. NumberCountsFactory or WeakLensingFactory ).
+        tracer_type (str): Type of the tracer 
+            (e.g. NumberCountsFactory or WeakLensingFactory ).
         function_type (str): Type of the function (e.g., harmonic or real space).
         year (str): Year of the survey ('1' for Y1, '10' for Y10).
 

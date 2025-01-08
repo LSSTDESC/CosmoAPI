@@ -5,6 +5,25 @@ general:
 observations:
   sacc:
 
+cosmology:
+    Omega_m: 0.3388 # Matter density fraction (dark matter + baryonic).
+    A_s: 1.9019e-9 # Amplitude of scalar perturbations.
+    #sigma8: &sigma8 0.807 # Variance of matter density perturbations at 8 Mpc/h.
+    n_s: 0.9493 # Primordial scalar perturbation spectral index.
+    Omega_b: 0.04575 # Baryonic matter density fraction.
+    h: 0.6714 # Hubble constant divided by 100 km/s/Mpc; dimensionless.
+    w0: -1.0 # First order term of dark energy equation.
+    wa: 0.0 # Second order term of dark energy equation.
+    m_nu: 0.1 # Sum of neutrino masses in eV.
+    Neff: 3.044 # Effective number of neutrino species.
+    T_CMB: 2.7255 # CMB temperature in K.
+    Omega_k: 0.0 # Curvature density fraction.
+    mass_split: "normal" # Neutrino mass hierarchy.
+    non_linear: true
+    extra_parameters:
+      camb:
+        halofit_version: "mead2020"
+
 probes:
   source:
     function: TwoPointHarmonic
