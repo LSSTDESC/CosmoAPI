@@ -16,7 +16,7 @@ from firecrown.metadata_types import (
     InferredGalaxyZDist,
 )
 
-from CosmoAPI.two_pt_func.tracers_io import process_probes_load_2pt
+from CosmoAPI.two_pt_func.tracer_tools import process_probes_load_2pt
 from CosmoAPI.not_implemented import not_implemented_message
 
 

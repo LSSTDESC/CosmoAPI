@@ -72,15 +72,15 @@ def build_modeling_tools(config: dict) -> ModelingTools:
         ModelingTools: Modeling tools object with cosmology parameters.
     """
     cosmo_config = config["cosmology"]
-    factory_config = config["firecrown_parameters"]
+    #factory_config = config["firecrown_parameters"]
 
-    if "Omega_m" in factory_config.keys():
-        factory_config["Omega_c"] = (
-            factory_config["Omega_m"] - factory_config["Omega_b"]
+    if "Omega_m" in cosmo_config.keys():
+        cosmo_config["Omega_c"] = (
+            cosmo_config["Omega_m"] - cosmo_config["Omega_b"]
         )
-        del factory_config["Omega_m"]
+        del cosmo_config["Omega_m"]
 
-    if "m_nu" in factory_config.keys():
+    if "m_nu" in cosmo_config.keys():
         mass_split = (
             cosmo_config["mass_split"]
             if "mass_split" in cosmo_config.keys()
@@ -115,9 +115,5 @@ def build_modeling_tools(config: dict) -> ModelingTools:
                 mass_split=cosmo_config["mass_split"],
             )
         )
-
-    firecrown_parameters = ParamsMap(factory_config)
-    _tools.update(firecrown_parameters)
-    _tools.prepare()
 
     return _tools

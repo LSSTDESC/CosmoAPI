@@ -1,42 +1,14 @@
-import sys
-import yaml
 import numpy as np
-import importlib
 import firecrown
 from firecrown.metadata_functions import make_all_photoz_bin_combinations
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
 from CosmoAPI.two_pt_func.nz_loader import load_all_redshift_distr
-from CosmoAPI.two_pt_func.tracers_io import process_probes_load_2pt
-
+from CosmoAPI.two_pt_func.tracer_tools import process_probes_load_2pt
+from CosmoAPI.two_pt_func.tracer_tools import generate_ell_theta_array
 from CosmoAPI.not_implemented import not_implemented_message
 from CosmoAPI.firecrown_tools import load_systematics_factory
-
-def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
-    """
-    Generate a linear or logarithmic array based on the  configuration in the YAML data.
-    
-    Args:
-        yaml_data (dict): Parsed YAML data in dictionary format.
-        
-    Returns:
-        np.ndarray: Generated array based on the ell_bins configuration.
-    """
-    # calling thix x because it could be ell_bins or theta_bins
-    x_array = yaml_data.get(type_key, {})
-
-    array_type = x_array.get('type')
-    min_val = x_array.get('min')
-    max_val = x_array.get('max')
-    nbins = x_array.get('nbins')
-
-    if array_type == 'log':
-        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(dtype))
-    elif array_type == 'linear':
-        return np.linspace(min_val, max_val, nbins).astype(dtype)
-    else:
-        raise ValueError(f"Unknown array type: {array_type}")
 
 
 def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes, 

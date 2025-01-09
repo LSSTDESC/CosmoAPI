@@ -80,8 +80,7 @@ import firecrown.likelihood.two_point as tp
 from firecrown.parameters import ParamsMap
 from augur.utils.cov_utils import TJPCovGaus
 
-sys.path.append("..")
-from api_io import load_yaml_file
+from CosmoAPI.api_io import load_yaml_file
 
 
 def build_modeling_tools(config: dict) -> ModelingTools:

@@ -1,5 +1,5 @@
+import numpy as np
 from typing import Dict, Tuple, Any, List, Type
-
 from CosmoAPI.not_implemented import not_implemented_message
 from CosmoAPI.api_io import load_metadata_function_class
 
@@ -62,3 +62,29 @@ def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Type, List[str]]
         print(f"All nz_type probes have the same function: {function_name}")
 
     return loaded_function, probe_dict
+
+def generate_ell_theta_array(yaml_data: dict, type_key: str,
+                            dtype:Type=float) -> np.ndarray:
+    """
+    Generate a linear or logarithmic array based on the  configuration in the YAML data.
+    
+    Args:
+        yaml_data (dict): Parsed YAML data in dictionary format.
+        
+    Returns:
+        np.ndarray: Generated array based on the ell_bins configuration.
+    """
+    # calling thix x because it could be ell_bins or theta_bins
+    x_array = yaml_data.get(type_key, {})
+
+    array_type = x_array.get('type')
+    min_val = x_array.get('min')
+    max_val = x_array.get('max')
+    nbins = x_array.get('nbins')
+
+    if array_type == 'log':
+        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(dtype))
+    elif array_type == 'linear':
+        return np.linspace(min_val, max_val, nbins).astype(dtype)
+    else:
+        raise ValueError(f"Unknown array type: {array_type}")
