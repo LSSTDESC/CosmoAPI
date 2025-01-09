@@ -7,8 +7,8 @@ from firecrown.metadata_functions import make_all_photoz_bin_combinations
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
-from CosmoAPI.two_point_functions.nz_loader import load_all_redshift_distr
-from CosmoAPI.two_point_functions.tracers_io import process_probes_load_2pt
+from CosmoAPI.two_pt_func.nz_loader import load_all_redshift_distr
+from CosmoAPI.two_pt_func.tracers_io import process_probes_load_2pt
 
 from CosmoAPI.not_implemented import not_implemented_message
 from CosmoAPI.firecrown_tools import load_systematics_factory
