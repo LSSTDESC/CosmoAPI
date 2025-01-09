@@ -7,11 +7,11 @@ from firecrown.metadata_functions import make_all_photoz_bin_combinations
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 
-from .nz_loader import load_all_redshift_distr
-from .tracers_io import process_probes_load_2pt
-sys.path.append("..")
-from not_implemented import not_implemented_message
+from CosmoAPI.two_point_functions.nz_loader import load_all_redshift_distr
+from CosmoAPI.two_point_functions.tracers_io import process_probes_load_2pt
 
+from CosmoAPI.not_implemented import not_implemented_message
+from CosmoAPI.firecrown_tools import load_systematics_factory
 
 def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
     """
@@ -37,54 +37,6 @@ def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
         return np.linspace(min_val, max_val, nbins).astype(dtype)
     else:
         raise ValueError(f"Unknown array type: {array_type}")
-
-def load_systematics_factory(probe_systematics):
-    """
-    Dynamically load a class based on the systematics 'type' specified in the YAML file.
-
-    Args:
-        systematics_type (str): The 'type' field from the YAML specifying which factory to use.
-
-    Returns:
-        The loaded class from the firecrown library.
-    """
-    # Define base module path based on firecrown's library structure
-    base_module = "firecrown.likelihood"
-
-    # Mapping of known factories to their submodules
-    type_to_submodule = {
-        'WeakLensingFactory': 'weak_lensing',
-        'NumberCountsFactory': 'number_counts',
-        # Add other mappings as needed, or consider an automatic lookup if patterns are consistent
-    }
-
-    systematics_type = probe_systematics['type']
-    # Get the submodule for the type
-    submodule = type_to_submodule.get(systematics_type)
-
-    if submodule is None:
-        print(not_implemented_message)
-        raise ImportError(f"Unknown systematics type: {systematics_type}")
-
-    # Construct the full module path
-    module_path = f"{base_module}.{submodule}"
-
-    try:
-        # Dynamically import the module
-        module = importlib.import_module(module_path)
-        # Get the class from the module
-        factory_class = getattr(module, systematics_type)
-        # copy the systematics dictionary
-        systematics_yaml = probe_systematics.copy()
-        # remove the type key
-        del systematics_yaml['type']
-        # instantiate the factory
-        factory = base_model_from_yaml(factory_class, yaml.dump(systematics_yaml))
-        return factory
-    except ImportError as e:
-        raise ImportError(f"Could not import module {module_path}: {e}")
-    except AttributeError as e:
-        raise AttributeError(f"Class '{systematics_type}' not found in module {module_path}: {e}")
 
 
 def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes, 

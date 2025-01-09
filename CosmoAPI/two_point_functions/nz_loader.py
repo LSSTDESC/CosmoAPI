@@ -1,5 +1,3 @@
-import importlib
-import sys
 import numpy as np
 from typing import Type
 from firecrown.generators.inferred_galaxy_zdist import (
@@ -18,9 +16,8 @@ from firecrown.metadata_types import (
     InferredGalaxyZDist,
 )
 
-from .tracers_io import process_probes_load_2pt
-sys.path.append("..")
-from not_implemented import not_implemented_message
+from CosmoAPI.two_point_functions.tracers_io import process_probes_load_2pt
+from CosmoAPI.not_implemented import not_implemented_message
 
 
 def load_all_redshift_distr(yaml_data: dict) -> list:

@@ -1,9 +1,7 @@
-import sys
 from typing import Dict, Tuple, Any, List, Type
 
-sys.path.append("..")
-from not_implemented import not_implemented_message
-from api_io import load_metadata_function_class
+from CosmoAPI.not_implemented import not_implemented_message
+from CosmoAPI.api_io import load_metadata_function_class
 
 
 def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Type, List[str]]:
