@@ -19,6 +19,7 @@ def _generate_two_point_metadata(yaml_data: dict, two_point_function, two_pt_pro
     """
     Generate the metadata for the two-point functions based on the YAML data.
 
+    FIXME: this function is broken and needs to be generalised
     Parameters
     ----------
     yaml_data : dict
@@ -41,8 +42,10 @@ def _generate_two_point_metadata(yaml_data: dict, two_point_function, two_pt_pro
         ells_list = []
         for p in two_pt_probes:
             ells_list.append(generate_ell_theta_array(yaml_data['probes'][p], xtype))
+        # FIXME: this look is wrong!
         all_two_point_metadata = [two_point_function(XY=ij, ells=ell) 
-                                 for ij, ell in zip(two_point_bins, ells_list)]
+                                  for ij in two_point_bins for ell in ells_list]
+
     elif two_point_function is firecrown.metadata_types.TwoPointReal:
         #FIXME: this is breaking for some strange reason
         print(not_implemented_message)
@@ -88,6 +91,7 @@ def prepare_2pt_functions(yaml_data: dict) -> Tuple[UpdatableCollection, List[An
     # load all the systematics for all probes:
     probes = yaml_data.get("probes", [])
     for p in two_pt_probes.keys():
+        print(f"Loading systematics for probe {p}")
         type_factory = probes[p]['systematics'].get('type')
         if type_factory == 'WeakLensingFactory':
             wlfact = load_systematics_factory(yaml_data['probes'][p]['systematics'])

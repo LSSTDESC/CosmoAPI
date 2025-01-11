@@ -63,7 +63,7 @@ def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
         z_ = LinearGrid1D(
             start=config_z["z_min"],
             end=config_z["z_max"],
-            num=config_z["z_number"]
+            num=config_z["z_number"] #FIXME: this is completely ignored by firecrown
         )
     except KeyError:
         print("No z_array provided. Using default redshift array from 0.0001 to 3.5")

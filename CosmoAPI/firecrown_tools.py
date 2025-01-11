@@ -12,6 +12,51 @@ from pydantic import BaseModel
 
 from CosmoAPI.not_implemented import not_implemented_message
 
+def extract_per_bin_systematics(yaml_data: dict) -> dict:
+    """
+    Extracts the per_bin_systematics parameters from the YAML data and stores them in a dictionary
+    with the naming convention {probe_name}_{index}_{systematic_name}.
+
+    Args:
+        yaml_data (dict): Parsed YAML data in dictionary format.
+
+    Returns:
+        dict: Dictionary with the extracted per_bin_systematics parameters.
+    """
+    result = {}
+
+    probes = yaml_data.get('probes', {})
+    for probe_name, probe_data in probes.items():
+        systematics = probe_data.get('systematics', {})
+        per_bin_systematics = systematics.get('per_bin_systematics', [])
+
+        for systematic in per_bin_systematics:
+            systematic_type = systematic.get('type')
+            for key, values in systematic.items():
+                if key != 'type':
+                    for idx, value in enumerate(values):
+                        result[f"{probe_name}_{idx}_{key}"] = float(value)
+
+    return result
+
+def update_missing_keys(my_values: dict, default_values: dict) -> dict:
+    """
+    Update my_values dictionary by adding keys and values from default_values
+    that are missing in my_values.
+
+    Args:
+        my_values (dict): The dictionary to be updated.
+        default_values (dict): The dictionary containing default keys and values.
+
+    Returns:
+        dict: The updated my_values dictionary.
+    """
+    for key, value in default_values.items():
+        if key not in my_values:
+            my_values[key] = value
+
+    return my_values
+
 def load_systematics_factory(probe_systematics: dict) -> BaseModel: 
     """
     Dynamically load a class based on the systematics 'type' specified in the YAML file.
@@ -90,11 +135,11 @@ def build_modeling_tools(config: dict) -> ModelingTools:
 
     if "m_nu" in cosmo_config.keys():
         mass_split = (
-            cosmo_config["mass_split"]
+            cosmo_config["extra_parameters"]["mass_split"]
             if "mass_split" in cosmo_config.keys()
             else "normal"
         )
-        cosmo_config["mass_split"] = mass_split
+        cosmo_config["extra_parameters"]["mass_split"] = mass_split
 
     if "A_s" in cosmo_config.keys() and "sigma8" not in cosmo_config.keys():
         psa_param = PoweSpecAmplitudeParameter.AS
@@ -104,11 +149,11 @@ def build_modeling_tools(config: dict) -> ModelingTools:
         raise ValueError("The amplitude parameter must be"
                          "either A_s or sigma8")
 
-    if "extra_parameters" in cosmo_config.keys():
+    if "camb" in cosmo_config['extra_parameters'].keys():
         _tools = ModelingTools(
             ccl_factory=CCLFactory(
                 require_nonlinear_pk=True,
-                mass_split=cosmo_config["mass_split"],
+                mass_split=cosmo_config["extra_parameters"]["mass_split"],
                 amplitude_parameter=psa_param,
                 camb_extra_params=CAMBExtraParams(
                     **cosmo_config["extra_parameters"]["camb"]
@@ -120,7 +165,7 @@ def build_modeling_tools(config: dict) -> ModelingTools:
             ccl_factory=CCLFactory(
                 require_nonlinear_pk=True,
                 amplitude_parameter=psa_param,
-                mass_split=cosmo_config["mass_split"],
+                mass_split=cosmo_config["extra_parameters"]["mass_split"],
             )
         )
 
