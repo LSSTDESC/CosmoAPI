@@ -41,7 +41,9 @@ probes:
       type: WeakLensingFactory
       per_bin_systematics:
       - type: MultiplicativeShearBiasFactory
+        mult_bias: [1e-3, 1e-3, 1e-3, 1e-3, 1e-3]
       - type: PhotoZShiftFactory
+        delta_z: [0.2, 0.1, 0.1, 0.2, 0.1]
       global_systematics:
       - type: LinearAlignmentSystematicFactory
         alphag: 1.0
