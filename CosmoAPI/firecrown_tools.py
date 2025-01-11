@@ -52,6 +52,14 @@ def load_systematics_factory(probe_systematics: dict) -> BaseModel:
         systematics_yaml = probe_systematics.copy()
         # remove the type key
         del systematics_yaml['type']
+
+        # Clean up per_bin_systematics
+        if 'per_bin_systematics' in systematics_yaml:
+            for item in systematics_yaml['per_bin_systematics']:
+                keys_to_remove = [key for key in item if key != 'type']
+                for key in keys_to_remove:
+                    del item[key]
+
         # instantiate the factory
         factory = base_model_from_yaml(factory_class, yaml.dump(systematics_yaml))
         return factory

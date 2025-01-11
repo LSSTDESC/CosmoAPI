@@ -61,7 +61,10 @@ probes:
       type: NumberCountsFactory
       per_bin_systematics:
       - type: PhotoZShiftFactory
+      - type: LinearBiasSystematicFactory
+        bias: [1., 2., 3., 4., 5.]
       global_systematics: []
+      include_rsd: true
 
   SNe:
     function: SuperNovae
