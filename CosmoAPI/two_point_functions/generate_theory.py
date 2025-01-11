@@ -6,7 +6,7 @@ import firecrown
 from firecrown.metadata_functions import make_all_photoz_bin_combinations
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
-
+from typing import Dict, Any, List, Tuple
 
 from .nz_loader import load_all_nz
 sys.path.append("..")
@@ -14,7 +14,7 @@ from not_implemented import not_implemented_message
 from api_io import load_metadata_function_class
 
 
-def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
+def generate_ell_theta_array_from_yaml(yaml_data: Dict[str, Any], type_key: str, dtype: type = float) -> np.ndarray:
     """
     Generate a linear or logarithmic array based on the  configuration in the YAML data.
     
@@ -39,7 +39,7 @@ def generate_ell_theta_array_from_yaml(yaml_data, type_key, dtype=float):
     else:
         raise ValueError(f"Unknown array type: {array_type}")
 
-def load_systematics_factory(probe_systematics):
+def load_systematics_factory(probe_systematics: Dict[str, Any]) -> Any:
     """
     Dynamically load a class based on the systematics 'type' specified in the YAML file.
 
@@ -87,7 +87,7 @@ def load_systematics_factory(probe_systematics):
     except AttributeError as e:
         raise AttributeError(f"Class '{systematics_type}' not found in module {module_path}: {e}")
 
-def process_probes_load_2pt(yaml_data):
+def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Any, List[str]]:
     """
     Process the probes from the YAML data, check if 'function' 
     is the same across probes with 'nz_type',
@@ -138,8 +138,8 @@ def process_probes_load_2pt(yaml_data):
 
     return loaded_function, nz_type_probes
 
-def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes, 
-                                two_point_bins):
+def generate_two_point_metadata(yaml_data: Dict[str, Any], two_point_function: Any, two_pt_probes: List[str], 
+                                two_point_bins: List[Any]) -> List[Any]:
     """
     Generate the metadata for the two-point functions based on the YAML data.
 
@@ -181,7 +181,7 @@ def generate_two_point_metadata(yaml_data, two_point_function, two_pt_probes,
         raise ValueError("Unknown TwoPointFunction type")
     return all_two_point_metadata
 
-def prepare_2pt_functions(yaml_data):
+def prepare_2pt_functions(yaml_data: Dict[str, Any]) -> Tuple[Any, List[Any]]:
     # here we call this X because we do not know if it is ell_bins or theta_bins
     two_point_function, two_pt_probes = process_probes_load_2pt(yaml_data)
 
