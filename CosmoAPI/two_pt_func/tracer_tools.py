@@ -64,32 +64,38 @@ def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Type, List[str]]
 
     return loaded_function, probe_dict
 
-def generate_ell_theta_array(yaml_data: dict, type_key: str,
-                            dtype:Type=float) -> np.ndarray:
+def generate_ell_theta_arrays(yaml_data: Dict[str, Any], dtype: Type[float] = float) -> Dict[str, np.ndarray]:
     """
-    Generate a linear or logarithmic array based on the  configuration in the YAML data.
-    
+    Generate linear or logarithmic arrays based on the configuration
+    for all probe combinations.
+
     Args:
         yaml_data (dict): Parsed YAML data in dictionary format.
-        
+        dtype (Type[float]): The data type of the generated arrays.
+
     Returns:
-        np.ndarray: Generated array based on the ell_bins configuration.
+        Dict[str, np.ndarray]: Dictionary of generated arrays based on the scale_cuts configuration
+                               for each probe combination.
     """
-    # calling thix x because it could be ell_bins or theta_bins
-    x_array = yaml_data.get(type_key, {})
+    scale_arrays = {}
 
-    array_type = x_array.get('type')
-    min_val = x_array.get('min')
-    max_val = x_array.get('max')
-    nbins = x_array.get('nbins')
-    use_for_cross = x_array.get('use_for_cross', False)
+    probe_combinations = yaml_data.get('probe_combinations', {})
+    for probe_combination, config in probe_combinations.items():
+        scale_cuts = config.get('scale_cuts', {})
 
-    if array_type == 'log':
-        return np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(dtype))
-    elif array_type == 'linear':
-        return np.linspace(min_val, max_val, nbins).astype(dtype)
-    else:
-        raise ValueError(f"Unknown array type: {array_type}")
+        array_type = scale_cuts.get('type')
+        min_val = scale_cuts.get('min')
+        max_val = scale_cuts.get('max')
+        nbins = scale_cuts.get('nbins')
+
+        if array_type == 'log':
+            scale_arrays[probe_combination] = np.unique(np.logspace(np.log10(min_val), np.log10(max_val), nbins).astype(dtype))
+        elif array_type == 'linear':
+            scale_arrays[probe_combination] = np.linspace(min_val, max_val, nbins).astype(dtype)
+        else:
+            raise ValueError(f"Unknown array type: {array_type}")
+
+    return scale_arrays
 
 def build_twopointxy_combinations(config_yaml: dict, _distribution_list: list,) -> dict:
 
@@ -115,10 +121,15 @@ def build_twopointxy_combinations(config_yaml: dict, _distribution_list: list,) 
                 # Generate all combinations
                 max_bin = max(int(b.split('_')[-1]) for b in bin_names_nz if tracer.split('_')[0] in b)
                 bin_combinations = [(i, j) for i in range(max_bin + 1) for j in range(i, max_bin + 1)]
+                # change the bin_combinations to the numerical values in the original dictionary
+                config_yaml["probe_combinations"][tracer]["bin_combinations"] = bin_combinations
+
             elif bin_combinations == 'autos':
                 # Generate auto combinations (x = y)
                 bins = [int(b.split('_')[-1]) for b in bin_names_nz if tracer.split('_')[0] in b]
                 bin_combinations = [[x, x] for x in bins]
+                # change the bin_combinations to the numerical values in the original dictionary
+                config_yaml["probe_combinations"][tracer]["bin_combinations"] = bin_combinations
             else:
                 raise ValueError(f"Unknown bin_combinations value: {bin_combinations}")
         for comb in bin_combinations:
