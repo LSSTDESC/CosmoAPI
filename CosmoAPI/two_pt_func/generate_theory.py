@@ -23,7 +23,6 @@ def _generate_two_point_metadata(yaml_data: dict,
     """
     Generate the metadata for the two-point functions based on the YAML data.
 
-    FIXME: this function is broken and needs to be generalised
     Parameters
     ----------
     yaml_data : dict
