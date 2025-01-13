@@ -63,11 +63,13 @@ def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
         z_ = LinearGrid1D(
             start=config_z["z_min"],
             end=config_z["z_max"],
-            num=config_z["z_number"] #FIXME: this is completely ignored by firecrown
+            num=config_z["z_number"]
         )
+        _use_autoknots = config_z.get("use_autoknots", False)
     except KeyError:
         print("No z_array provided. Using default redshift array from 0.0001 to 3.5")
         z_ = LinearGrid1D(start=0.0001, end=3.5, num=1000)
+        _use_autoknots = True 
 
     # generate the redshift array
     z_array = z_.generate()
@@ -76,12 +78,12 @@ def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
         nz_binned = _get_srd_distribution_binned(z_array, tracer_name=probe_name,
                                                  tracer_type=probe_type,
                                                  function_type=two_pt_type,
-                                                 year="1")
+                                                 year="1", use_autoknots=_use_autoknots)
     elif _nz_type == "SRD_Y10":
         nz_binned = _get_srd_distribution_binned(z_array, tracer_name=probe_name,
                                                  tracer_type=probe_type,
                                                  function_type=two_pt_type,
-                                                 year="1")
+                                                 year="10", use_autoknots=_use_autoknots)
     elif _nz_type == "file":
         nz_file = config['probes'][probe_name]['nz_file']
         nz_binned = _build_distribution_binned(nz_file, probe_name,
@@ -156,7 +158,7 @@ def _build_distribution_binned(distribution_path: str,
 
 def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
                                 tracer_type: str, function_type: str,
-                                year: str) -> list:
+                                year: str, use_autoknots: bool) -> list:
     """
     Get the binned distribution for lens/source tracer from the SRD Y1 or Y10.
 
@@ -174,7 +176,7 @@ def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
     """
     if "NumberCountsFactory" in tracer_type:
         if year == "1":
-            zdist = ZDistLSSTSRD.year_1_lens(use_autoknot=True,
+            zdist = ZDistLSSTSRD.year_1_lens(use_autoknot=use_autoknots,
                                              autoknots_reltol=1.0e-5)
             bin_edges = Y1_LENS_BINS["edges"]
             sigma_z = Y1_LENS_BINS["sigma_z"]
@@ -182,7 +184,7 @@ def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
 
         elif year == "10":
             zdist = ZDistLSSTSRD.year_10_lens(
-                use_autoknot=True, autoknots_reltol=1.0e-5
+                use_autoknot=use_autoknots, autoknots_reltol=1.0e-5
             )
             bin_edges = Y10_LENS_BINS["edges"]
             sigma_z = Y10_LENS_BINS["sigma_z"]
@@ -197,7 +199,7 @@ def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
             raise ValueError("Unknown TwoPointFunction type")
         if year == "1":
             zdist = ZDistLSSTSRD.year_1_source(
-                use_autoknot=True, autoknots_reltol=1.0e-5
+                use_autoknot=use_autoknots, autoknots_reltol=1.0e-5
             )
             bin_edges = Y1_SOURCE_BINS["edges"]
             sigma_z = Y1_SOURCE_BINS["sigma_z"]
@@ -205,7 +207,7 @@ def _get_srd_distribution_binned(z: np.ndarray, tracer_name: str,
 
         elif year == "10":
             zdist = ZDistLSSTSRD.year_10_source(
-                use_autoknot=True, autoknots_reltol=1.0e-5
+                use_autoknot=use_autoknots, autoknots_reltol=1.0e-5
             )
             bin_edges = Y10_SOURCE_BINS["edges"]
             sigma_z = Y10_SOURCE_BINS["sigma_z"]
