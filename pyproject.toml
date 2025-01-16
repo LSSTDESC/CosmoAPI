@@ -11,6 +11,7 @@ requires-python = ">=3.12"
 license = {file = "LICENSE"}
 maintainers = [
     {name = "Arthur Loureiro", email = "arthur.loureiro@fysik.su.se"},
+    {name = "Vitor Gozzi", email = "vitormg99@cbpf.br"},
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
