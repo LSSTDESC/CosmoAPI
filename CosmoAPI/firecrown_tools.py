@@ -2,6 +2,7 @@ import importlib
 import yaml
 from firecrown.modeling_tools import ModelingTools
 from firecrown.parameters import ParamsMap
+from firecrown.updatable import UpdatableCollection, get_default_params
 from firecrown.utils import base_model_from_yaml
 from firecrown.ccl_factory import (
     CCLFactory,
@@ -14,8 +15,9 @@ from CosmoAPI.not_implemented import not_implemented_message
 
 def extract_per_bin_systematics(yaml_data: dict) -> dict:
     """
-    Extracts the per_bin_systematics parameters from the YAML data and stores them in a dictionary
-    with the naming convention {probe_name}_{index}_{systematic_name}.
+    Extracts the per_bin_systematics parameters from the YAML data 
+    and stores them in a dictionary with the naming convention 
+    {probe_name}_{index}_{systematic_name}.
 
     Args:
         yaml_data (dict): Parsed YAML data in dictionary format.
@@ -56,6 +58,45 @@ def update_missing_keys(my_values: dict, default_values: dict) -> dict:
             my_values[key] = value
 
     return my_values
+
+def build_firecrown_params_map_and_tools(yaml_data: dict,
+                                        firecrown_updateble: UpdatableCollection,
+                                        update_tools: bool = True
+                                        ) -> ParamsMap:
+    """
+    Build a ParamsMap object from the YAML data and the UpdatableCollection.
+
+    Args:
+        yaml_data (dict): Parsed YAML data in dictionary format.
+        firecrown_updateble (UpdatableCollection): UpdatableCollection object.
+    """
+
+    # build modelling tools
+    tools = build_modeling_tools(yaml_data)
+
+    # Extract the per_bin_systematics parameters
+    per_bin_systematics = extract_per_bin_systematics(yaml_data)
+
+    # cosmology dictionary
+    cosmology = yaml_data.get('cosmology', {}).copy()
+
+    # deletes the extra parameters from the cosmology dictionary
+    _ = cosmology.pop('extra_parameters', {})
+    combined_dict = {**cosmology, **per_bin_systematics}
+
+    # gets the default parameters from firecrown_updateble and tools
+    default_values = get_default_params(tools, firecrown_updateble)
+
+    # update the combined_dict with the default_values
+    combined_dict = update_missing_keys(combined_dict, default_values)
+
+    firecrown_param_maps = ParamsMap(combined_dict)
+
+    if update_tools:
+        tools.update(firecrown_param_maps)
+        tools.prepare()
+    return firecrown_param_maps, tools
+
 
 def load_systematics_factory(probe_systematics: dict) -> BaseModel: 
     """

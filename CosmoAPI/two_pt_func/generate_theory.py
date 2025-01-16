@@ -1,11 +1,14 @@
 import numpy as np
 from typing import Dict, Tuple, List, Any, Type
 
+import sacc
 import firecrown
-from firecrown.metadata_functions import make_all_photoz_bin_combinations
+from firecrown.metadata_functions import InferredGalaxyZDist
 import firecrown.likelihood.two_point as tp
 from firecrown.utils import base_model_from_yaml
 from firecrown.updatable import UpdatableCollection
+from firecrown.modeling_tools import ModelingTools
+from firecrown.parameters import ParamsMap
 
 from CosmoAPI.two_pt_func.nz_loader import load_all_redshift_distr
 from CosmoAPI.two_pt_func.tracer_tools import (
@@ -60,7 +63,9 @@ def _generate_two_point_metadata(yaml_data: dict,
                 raise ValueError(f"Unknown two-point function type: {two_point_function}")
     return two_point_metadata_list
 
-def prepare_2pt_functions(yaml_data: dict) -> Tuple[UpdatableCollection, List[Any]]:
+def prepare_2pt_functions(yaml_data: dict,
+                          tomo_z_bins: List[InferredGalaxyZDist],
+                          ) -> Tuple[UpdatableCollection, List[Any]]:
     """
     Prepare the two-point functions based on the YAML data.
 
@@ -83,13 +88,15 @@ def prepare_2pt_functions(yaml_data: dict) -> Tuple[UpdatableCollection, List[An
         raise NotImplementedError("More than 2 2pt probes not implemented")
 
     # loads the nz_type probes
-    nzs = load_all_redshift_distr(yaml_data)
+    #nzs = load_all_redshift_distr(yaml_data)
 
     # scale arrays for each probe combination
     scales = generate_ell_theta_arrays(yaml_data)
 
     # load all the systematics for all probes:
     # FIXME: Need to generalise for more than 2 probes!
+    # Firecrown does not support more than 2 probes yet: 
+    # https://github.com/LSSTDESC/firecrown/issues/480
     probes = yaml_data.get("probes", [])
     for p in two_pt_probes.keys():
         print(f"Loading systematics for probe {p}")
@@ -104,7 +111,7 @@ def prepare_2pt_functions(yaml_data: dict) -> Tuple[UpdatableCollection, List[An
     # generate the metadata for the two-point functions
     all_two_point_metadata = _generate_two_point_metadata(yaml_data,
                                                          two_point_function,
-                                                         nzs, scales,)
+                                                         tomo_z_bins, scales,)
 
     # prepare all the two point functions:
     all_two_point_functions = tp.TwoPoint.from_metadata(
@@ -114,3 +121,28 @@ def prepare_2pt_functions(yaml_data: dict) -> Tuple[UpdatableCollection, List[An
     )
 
     return all_two_point_functions, all_two_point_metadata
+
+def construct_sacc(
+        yaml_data: dict,
+        _tools: ModelingTools,
+        _two_point_functions: UpdatableCollection,
+        _params_maps: ParamsMap,
+) -> sacc.Sacc:
+    """
+    Construct a sacc object based on the modeling tools, two-point functions, and parameter maps.
+
+    Parameters
+    ----------
+    _tools : ModelingTools
+        The modeling tools object.
+    _two_point_functions : UpdatableCollection
+        The two-point functions object.
+    _params_maps : firecrown.ParamsMap
+        The parameter maps object.
+
+    Returns
+    -------
+    sacc.Sacc
+        The sacc object.
+    """
+    return None
