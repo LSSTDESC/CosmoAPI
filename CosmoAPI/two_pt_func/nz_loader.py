@@ -16,6 +16,7 @@ from firecrown.metadata_types import (
     InferredGalaxyZDist,
 )
 
+from CosmoAPI.api_io import logger
 from CosmoAPI.two_pt_func.tracer_tools import process_probes_load_2pt
 from CosmoAPI.not_implemented import not_implemented_message
 
@@ -67,7 +68,7 @@ def _get_redshift_disribution(config: dict, probe_name: str, probe_type: str,
         )
         _use_autoknots = config_z.get("use_autoknots", False)
     except KeyError:
-        print("No z_array provided. Using default redshift array from 0.0001 to 3.5")
+        logger.warning("No z_array provided. Using default redshift array from 0.0001 to 3.5")
         z_ = LinearGrid1D(start=0.0001, end=3.5, num=1000)
         _use_autoknots = True 
 

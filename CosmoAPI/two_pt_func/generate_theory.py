@@ -94,7 +94,7 @@ def prepare_2pt_functions(
     two_point_function, two_pt_probes = process_probes_load_2pt(yaml_data)
 
     if len(two_pt_probes) > 2:
-        print(not_implemented_message)
+        logger.warning(not_implemented_message)
         raise NotImplementedError("More than 2 2pt probes not implemented")
 
     # loads the nz_type probes
@@ -109,7 +109,7 @@ def prepare_2pt_functions(
     # https://github.com/LSSTDESC/firecrown/issues/480
     probes = yaml_data.get("probes", [])
     for p in two_pt_probes.keys():
-        print(f"Loading systematics for probe {p}")
+        logger.info(f"Loading systematics for probe {p}")
         type_factory = probes[p]['systematics'].get('type')
         if type_factory == 'WeakLensingFactory':
             wlfact = load_systematics_factory(yaml_data['probes'][p]['systematics'])
@@ -255,6 +255,6 @@ def generate_sacc_theory_vector(yaml_data: dict, save_sacc: bool = False) -> sac
         # FIXME: need to save this in a subdirectory later!
         sacc_file = os.path.join(full_out_dir, f"{yaml_data['general']['run_name']}.sacc")
         logger.info(f"Saving sacc file to: {sacc_file}")
-        sacc_data.save_fits(sacc_file)
+        sacc_data.save_fits(sacc_file, overwrite=yaml_data['general'].get('overwrite', False))
 
     return sacc_data

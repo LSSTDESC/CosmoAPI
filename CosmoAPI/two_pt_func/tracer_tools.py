@@ -2,7 +2,7 @@ import numpy as np
 from typing import Dict, Tuple, Any, List, Type
 from firecrown.metadata_types import TwoPointXY
 from CosmoAPI.not_implemented import not_implemented_message
-from CosmoAPI.api_io import load_metadata_function_class
+from CosmoAPI.api_io import load_metadata_function_class, logger
 
 
 def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Type, List[str]]:
@@ -60,7 +60,7 @@ def process_probes_load_2pt(yaml_data: Dict[str, Any]) -> Tuple[Type, List[str]]
 
     # If nz_type_probes is non-empty, it confirms nz_type presence and function consistency
     if nz_type_probes:
-        print(f"All nz_type probes have the same function: {function_name}")
+        logger.debug(f"All nz_type probes have the same function: {function_name}")
 
     return loaded_function, probe_dict
 

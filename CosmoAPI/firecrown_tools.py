@@ -11,6 +11,7 @@ from firecrown.ccl_factory import (
 )
 from pydantic import BaseModel
 
+from CosmoAPI.api_io import logger
 from CosmoAPI.not_implemented import not_implemented_message
 
 def extract_per_bin_systematics(yaml_data: dict) -> dict:
@@ -123,7 +124,7 @@ def load_systematics_factory(probe_systematics: dict) -> BaseModel:
     submodule = type_to_submodule.get(systematics_type)
 
     if submodule is None:
-        print(not_implemented_message)
+        logger.warning(not_implemented_message)
         raise ImportError(f"Unknown systematics type: {systematics_type}")
 
     # Construct the full module path

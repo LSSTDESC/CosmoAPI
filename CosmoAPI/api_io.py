@@ -70,9 +70,6 @@ def setup_logging(config: dict={}, default_level=logging.INFO, env_key='LOG_CFG'
             'simple': {
                 'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             },
-            'detailed': {
-                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s [%(filename)s:%(lineno)d]'
-            },
         },
         'handlers': {
             'console': {
@@ -80,25 +77,17 @@ def setup_logging(config: dict={}, default_level=logging.INFO, env_key='LOG_CFG'
                 'formatter': 'simple',
                 'level': 'DEBUG',
             },
-            'file': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'detailed',
-                'level': 'DEBUG',
-                'filename': 'app.log',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-            },
         },
         'loggers': {
             'CosmoAPI': {
                 'level': 'DEBUG',
-                'handlers': ['console', 'file'],
+                'handlers': ['console'],
                 'propagate': False,
             },
         },
         'root': {
             'level': 'DEBUG',
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
         },
     }
 
