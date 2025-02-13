@@ -1,15 +1,14 @@
 import argparse
-
-from .api_io import load_yaml_file
+import logging
+import logging.config
+from .api_io import load_yaml_file, logger, set_log_level
 from .not_implemented import not_implemented_message
 
-def gen_datavec(config, verbose=False):
+def gen_datavec(config):
     # Functionality for generating data vector
-    if verbose:
-        print("Verbose mode enabled.")
-    print("Generating data vector with config:", config)
+    logger.info(f"Generating data vector with config")
 
-def gen_covariance(config):
+def gen_covariance(config): 
     # Functionality for generating covariance
     print(not_implemented_message)
 
@@ -74,9 +73,18 @@ def main():
     # Load the YAML configuration file
     config = load_yaml_file(args.config_file)
 
+    _log_level = config['general'].get('verbose_level', 'INFO').upper()
+    if args.verbose:
+        _log_level = 'DEBUG'
+    if _log_level != "INFO":
+        set_log_level(_log_level)
+
+    logger.info(f"Loaded YAML configuration file: {args.config_file}")
+    logger.debug(f"Configuration data: {config}")
+
     # Call the appropriate function based on the command
     if args.command == 'gen_datavec':
-        gen_datavec(config, verbose=args.verbose)
+        gen_datavec(config)
     elif args.command == 'gen_covariance':
         gen_covariance(config)
     elif args.command == 'forecast':

@@ -3,6 +3,7 @@ general:
   output_dir: ./dev/
   extra_sacc_metadata: "You can add anything you want here :) "
   overwrite: true #overwrites everything!
+  #verbose_level: DEBUG
 
 observations:
   sacc:

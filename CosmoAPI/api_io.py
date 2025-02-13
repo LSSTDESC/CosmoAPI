@@ -4,25 +4,6 @@ import logging
 import logging.config
 import importlib
 
-def setup_logging(
-    default_path='logging_config.yaml',
-    default_level=logging.INFO,
-    env_key='LOG_CFG'
-):
-    """Setup logging configuration"""
-    path = default_path
-    value = os.getenv(env_key, None)
-    if value:
-        path = value
-    if os.path.exists(path):
-        with open(path, 'rt') as f:
-            config = yaml.safe_load(f.read())
-        logging.config.dictConfig(config)
-    else:
-        logging.basicConfig(level=default_level)
-
-setup_logging()
-logger = logging.getLogger('CosmoAPI')
 
 def load_yaml_file(yaml_file: str) -> dict:
     """
@@ -80,3 +61,67 @@ def create_output_directory(output_dir: str) -> None:
     if not os.path.exists(absolute_output_dir):
         os.makedirs(absolute_output_dir)
     return absolute_output_dir
+
+def setup_logging(config: dict={}, default_level=logging.INFO, env_key='LOG_CFG'):
+    """Setup logging configuration"""
+    logging_config = {
+        'version': 1,
+        'formatters': {
+            'simple': {
+                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            },
+            'detailed': {
+                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s [%(filename)s:%(lineno)d]'
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+                'level': 'DEBUG',
+            },
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'detailed',
+                'level': 'DEBUG',
+                'filename': 'app.log',
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 5,
+            },
+        },
+        'loggers': {
+            'CosmoAPI': {
+                'level': 'DEBUG',
+                'handlers': ['console', 'file'],
+                'propagate': False,
+            },
+        },
+        'root': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file'],
+        },
+    }
+
+    # Override the logging level from the config
+    if not config:
+        log_level = config.get('general', {}).get('verbose_level', default_level)
+        logging_config['loggers']['CosmoAPI']['level'] = log_level
+        logging_config['root']['level'] = log_level
+
+    value = os.getenv(env_key, None)
+    if value and os.path.exists(value):
+        with open(value, 'rt') as f:
+            config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+    else:
+        logging.config.dictConfig(logging_config)
+
+def set_log_level(level):
+    """
+    Dynamically sets the log level for all loggers in the package.
+    """
+    logging.getLogger('CosmoAPI').setLevel(getattr(logging, level.upper(), logging.INFO))
+    logging.info("Log level changed to %s", level)
+
+setup_logging()
+logger = logging.getLogger('CosmoAPI')
