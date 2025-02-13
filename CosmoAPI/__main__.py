@@ -2,8 +2,26 @@ import argparse
 import logging
 import logging.config
 from .api_io import load_yaml_file, logger, set_log_level
+from . import __version__
 from .two_pt_func.generate_theory import generate_sacc_theory_vector
 from .not_implemented import not_implemented_message
+
+banner = rf"""
+
+ 　　　　　/)───―ヘ       _____             _ 
+ 　　　＿／　　　　＼    /  __ \           (_)
+ 　 ／　　　　●　　　●  | /   \/__ _ _ __  _ 
+ 　｜　　　　　　　▼　| | |    / _` | '_ \| |
+ 　｜　　　　　　　亠ノ | \__/\ (_| | |_) | |
+ 　 U￣U￣￣￣￣U￣U 　  \____/\__,_| .__/|_|
+ 　　　　　　　　　　　　　　　　　 | |      
+ 　　　　　　　　　　　　　　　　　 |_|  
+
+                   - Capi stands for CAPIVARA -
+   Cosmology API for Validation, Analysis, and Research Applications 
+        DESC's "Press Enter for Cosmology" Pipeline Interface
+                       Version {__version__}
+"""
 
 def generate_sacc(config):
     # Functionality for generating data vector
@@ -82,6 +100,7 @@ def main():
     if _log_level != "INFO":
         set_log_level(_log_level)
 
+    logger.info(banner)
     logger.info(f"Loaded YAML configuration file: {args.config_file}")
     logger.debug(f"Configuration data: {config}")
 
