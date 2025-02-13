@@ -2,11 +2,14 @@ import argparse
 import logging
 import logging.config
 from .api_io import load_yaml_file, logger, set_log_level
+from .two_pt_func.generate_theory import generate_sacc_theory_vector
 from .not_implemented import not_implemented_message
 
-def gen_datavec(config):
+def generate_sacc(config):
     # Functionality for generating data vector
-    logger.info(f"Generating data vector with config")
+    logger.info(f"Generating Synthetic Data Vectors ")
+    generate_sacc_theory_vector(config, save_sacc=True)
+
 
 def gen_covariance(config): 
     # Functionality for generating covariance
@@ -27,8 +30,8 @@ def main():
 
     # gen_datavec subcommand
     parser_datavec = subparsers.add_parser(
-        'gen_datavec',
-        help="Generate data vector from configuration"
+        'generate_sacc',
+        help="Generate a synthetic datavector given the configuration choices"
     )
     parser_datavec.add_argument(
         'config_file',
@@ -83,8 +86,8 @@ def main():
     logger.debug(f"Configuration data: {config}")
 
     # Call the appropriate function based on the command
-    if args.command == 'gen_datavec':
-        gen_datavec(config)
+    if args.command == 'generate_sacc':
+        generate_sacc(config)
     elif args.command == 'gen_covariance':
         gen_covariance(config)
     elif args.command == 'forecast':

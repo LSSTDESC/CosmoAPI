@@ -43,3 +43,6 @@ allow-direct-references = true
 
 [tool.hatch.version]
 path = "CosmoAPI/_version.py"
+
+[project.scripts]
+CosmoAPI = "CosmoAPI.__main__:main"
