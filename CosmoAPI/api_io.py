@@ -1,5 +1,28 @@
+import os
 import yaml
+import logging
+import logging.config
 import importlib
+
+def setup_logging(
+    default_path='logging_config.yaml',
+    default_level=logging.INFO,
+    env_key='LOG_CFG'
+):
+    """Setup logging configuration"""
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
+setup_logging()
+logger = logging.getLogger('CosmoAPI')
 
 def load_yaml_file(yaml_file: str) -> dict:
     """
@@ -12,8 +35,10 @@ def load_yaml_file(yaml_file: str) -> dict:
         dict: Parsed YAML data.
     """
     with open(yaml_file, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
+        yaml_data = yaml.safe_load(f)
+    # add the file name to the yaml_data
+    yaml_data["general"]['config_file'] = yaml_file
+    return yaml_data
 
 def load_metadata_function_class(function_name):
     """
@@ -38,3 +63,20 @@ def load_metadata_function_class(function_name):
         raise ImportError(f"Could not import module {base_module}: {e}")
     except AttributeError as e:
         raise AttributeError(f"Class '{function_name}' not found in module {base_module}: {e}")
+
+def create_output_directory(output_dir: str) -> None:
+    """
+    Create the output directory if it does not exist.
+
+    # FIXME: later on we need to create the outputs based on
+        the main that is called and the data products that are generated
+
+    Args:
+        output_dir (str): Path to the output directory.
+    """
+    # Convert the relative path to an absolute path
+    absolute_output_dir = os.path.abspath(output_dir)
+
+    if not os.path.exists(absolute_output_dir):
+        os.makedirs(absolute_output_dir)
+    return absolute_output_dir
