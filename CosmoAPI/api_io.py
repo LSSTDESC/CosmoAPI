@@ -4,6 +4,29 @@ import logging
 import logging.config
 import importlib
 
+def include_constructor(loader, node):
+    """
+    Custom constructor for YAML to handle the 'include' directive.
+    This allows for including other YAML files within a main YAML file.
+    Args:
+        loader (yaml.Loader): The YAML loader instance.
+        node (yaml.Node): The YAML node to process.
+    Returns:
+        dict: The loaded YAML data from the included file.
+    """
+    filename = loader.construct_scalar(node)
+    with open(os.path.join(loader._root, filename), 'r') as f:
+        return yaml.load(f, Loader=yaml.FullLoader)
+
+class LoaderWithInclude(yaml.FullLoader):
+    """
+    Custom YAML loader that allows for including other YAML files.
+    This is used to handle the 'include' directive in YAML files.
+    """
+    # Register the 'include' directive
+    def __init__(self, stream):
+        self._root = os.path.dirname(stream.name)
+        super().__init__(stream)
 
 def load_yaml_file(yaml_file: str) -> dict:
     """
@@ -15,8 +38,11 @@ def load_yaml_file(yaml_file: str) -> dict:
     Returns:
         dict: Parsed YAML data.
     """
+
+    yaml.add_constructor('!include', include_constructor,
+                         Loader=LoaderWithInclude)
     with open(yaml_file, "r", encoding="utf-8") as f:
-        yaml_data = yaml.safe_load(f)
+        yaml_data = yaml.load(f, Loader=LoaderWithInclude)
     # add the file name to the yaml_data
     yaml_data["general"]['config_file'] = yaml_file
     return yaml_data
